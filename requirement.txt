@@ -4,3 +4,4 @@ numpy
 pickle
 scikit-learn
 joblib
+sklearn

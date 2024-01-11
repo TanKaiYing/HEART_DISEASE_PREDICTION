@@ -4,7 +4,7 @@ import numpy as np
 import pickle
 
 DATASET_PATH = "data_cleaned_final.csv"
-LOG_MODEL_PATH = "logistic_regression.pkl"
+LOG_MODEL_PATH = "logistic_regression_model.pkl"
 
 def main():
     @st.cache_data(persist=True)

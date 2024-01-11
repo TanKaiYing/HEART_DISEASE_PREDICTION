@@ -7,7 +7,7 @@ with open('logistic_regression_model.pkl', 'rb') as file:
     log_model = pickle.load(file)
 
 
-DATASET_PATH = "data/data_cleaned_final.csv"
+DATASET_PATH = "data/data.zip/data_cleaned_final.csv"
 LOG_MODEL_PATH = "logistic_regression_model.pkl"
 
 def main():

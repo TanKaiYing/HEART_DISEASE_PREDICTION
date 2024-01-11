@@ -3,6 +3,10 @@ import pandas as pd
 import numpy as np
 import pickle
 
+with open('logistic_regression_model', 'rb') as file:
+    loaded_random_forest = pickle.load(file)
+
+
 DATASET_PATH = "data/data_cleaned_final.csv"
 LOG_MODEL_PATH = "logistic_regression_model.pkl"
 

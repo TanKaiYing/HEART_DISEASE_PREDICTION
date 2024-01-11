@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 import pickle
 
-DATASET_PATH = "data/data_cleaned_final.csv"
-LOG_MODEL_PATH = "model/logistic_regression.pkl"
+DATASET_PATH = "data_cleaned_final.csv"
+LOG_MODEL_PATH = "logistic_regression.pkl"
 
 def main():
     @st.cache_data(persist=True)
@@ -13,28 +13,30 @@ def main():
         return heart_df
 
     def user_input_features() -> pd.DataFrame:
-        sex = st.sidebar.selectbox("Gender", options=heart.Sex.unique())
         age_cat_options = ["Age 18 to 24", "Age 25 to 29", "Age 30 to 34", "Age 35 to 39",
                    "Age 40 to 44", "Age 45 to 49", "Age 50 to 54", "Age 55 to 59",
                    "Age 60 to 64", "Age 65 to 69", "Age 70 to 74", "Age 75 to 79",
                    "Age 80 or older"]
-        age_cat = st.sidebar.selectbox("Age category", options=age_cat_options)
-        stroke = st.sidebar.selectbox("Have you ever experienced a stroke?", options=("No", "Yes"))
-        alcohol_drinker = st.sidebar.selectbox("How often do you consume alcoholic beverages?", options=("No", "Yes"))
-        smoking_cat_options = ["Never smoked", "Former smoker", "Current smoker (Smokes every day)", "Current smoker (Smokes somedays)"]
+        age_cat = st.sidebar.selectbox("Age category", options=age_cat_options)      
+        smoking_cat_options = ["Never smoked", "Former smoker", "Current smoker (Smokes everyday)", "Current smoker (Smokes somedays)"]
         smoking = st.sidebar.selectbox("What is your current smoking status", options=smoking_cat_options)
-        checkuptime_cat_options = ["Within past year (anytime less than 12 months ago)", "5 or more years ago", "Within past 2 years (1 year but less than 2 years ago)", "Within past 5 years (2 years but less than 5 years ago)"]
-        lastCheckupTime = st.sidebar.selectbox("When was your last health check-up??", options=checkuptime_cat_options)
-        CovidPos = st.sidebar.selectbox("Have you ever been diagnosed with COVID-19?", options=("No", "Yes")) 
-                     
+        stroke = st.sidebar.selectbox("Have you ever experienced a stroke?", options=("No", "Yes"))
+        lung = st.sidebar.selectbox("Do you have a history of lung disease", options=("No", "Yes"))
+        jointpain = st.sidebar.selectbox("Do you have a history of joint pain?", options=("No", "Yes"))
+        kidney = st.sidebar.selectbox("Do you have a history of kidney problems?", options=("No", "Yes"))
+        hearing = st.sidebar.selectbox("Do you have any hearing impairment or deafness?", options=("No", "Yes"))
+        chestpain = st.sidebar.selectbox("Do you have a history of chest pain?", options=("No", "Yes"))
+        
+
         features = pd.DataFrame({
-            "Sex": [sex],
             "AgeCategory": [age_cat],
-            "HadStroke": [stroke],
-            "AlcoholDrinkers": [alcohol_drinker],
             "SmokerStatus": [smoking],
-            "LastCheckupTimes": [lastCheckupTime],
-            "CovidPos": [CovidPos],
+            "HadStroke": [stroke],
+            "HadCOPD": [lung],
+            "HadArthritis": [jointpain],
+            "HadKidneyDisease": [kidney],
+            "HadKidneyDisease": [hearing],
+            "HadAngina": [chestpain],
         })
 
         return features

@@ -49,8 +49,75 @@ def main():
     st.set_page_config(page_title="Heart Disease Prediction App", page_icon=":heart:")
 
     st.title("Heart Disease Prediction App")
-    st.subheader("Evaluate your risk of heart disease.")
+    st.subheader("Are you wondering about the condition of your heart? "
+                 "This app will help you to diagnose it!")
+    
+    col1, col2 = st.columns([1, 3])
 
+    with col1:
+        st.image("images/doctor_new.png",
+                 caption="Let's diagnose your heart health!",
+                 width=150)
+        st.markdown('##')
+        m = st.markdown("""
+            <style>
+            div.stButton > button:first-child {
+            background-color: #00cc00;color:white;
+            font-size:15px;
+            height:4em;
+            width:20em;
+            margin-top: 8cm; 
+            }
+            </style>""", unsafe_allow_html=True)
+        submit = st.button("Predict")
+
+    with col2:
+        st.markdown("""
+        **Did you know that heart attacks are the leading cause of death globally?**
+        
+        Heart disease is a leading cause of mortality worldwide, imposing a significant burden on healthcare systems and individuals.   Early detection and prevention are essential to mitigate its impact. As of the 2022 update, the demand for accurate predictive tools to assess heart disease risk is growing.
+        
+        In response, we propose the "Heart Disease Prediction" project, which utilizes data analytics and machine learning techniques to develop a predictive system. This system aims to offer timely risk assessments, personalized interventions, and address the pressing need for proactive measures in preventing heart disease.
+        
+        Here are a few steps away to predicting your heart disease status:
+            
+        1. Enter the parameters based on your health status.
+        
+        2. Press the "Predict" button and wait seconds to get the result. 
+
+        Please remember that this result does not constitute a diagnosis from a doctor! Healthcare facilities would never employ it. 
+        Therefore, if you experience any concerns or problems, see a doctor.
+        
+        
+            """)
+
+    heart = load_dataset()
+
+    st.sidebar.title("Feature Selection")
+    st.sidebar.image("images/heart-sidebar.png", width=200)
+
+    input_df = user_input_features()
+    df = pd.concat([input_df, heart], axis=1)
+
+    df.fillna(0, inplace=True)  # Handle missing values more thoughtfully based on your model
+
+    log_model = pickle.load(open(LOG_MODEL_PATH, "rb"))
+
+    if submit:
+        prediction = log_model.predict(df)
+        prediction_prob = log_model.predict_proba(df)
+        if prediction == 0:
+            st.markdown(f"**The probability that you'll have"
+                        f" heart disease is {round(prediction_prob[0][1] * 100, 2)}%."
+                        f" You are healthy!**")
+                                   
+        else:
+            st.markdown(f"**The probability that you will have"
+                        f" heart disease is {round(prediction_prob[0][1] * 100, 2)}%."
+                        f" It sounds like you are not healthy.**")
+           
+                        
+    
     # User input
     age_cat_options = ["Age 18 to 24", "Age 25 to 29", "Age 30 to 34", "Age 35 to 39",
                        "Age 40 to 44", "Age 45 to 49", "Age 50 to 54", "Age 55 to 59",
@@ -81,25 +148,6 @@ def main():
 
     # Encode user inputs
     input_encoded = encode_input(input_data)
-
-    # Scale user inputs
-    scaler = StandardScaler()
-    input_scaled = scaler.fit_transform(input_encoded)
-
-    # Prediction button
-    submit = st.sidebar.button("Predict")
-
-    if submit:
-        # Make a prediction
-        prediction = log_model.predict(input_scaled)
-        prediction_prob = log_model.predict_proba(input_scaled)
-
-        # Display results
-        st.subheader('Prediction Results')
-        if prediction[0] == 0:
-            st.success(f"Low risk of heart disease. Probability: {prediction_prob[0][0] * 100:.2f}%")
-        else:
-            st.error(f"High risk of heart disease. Probability: {prediction_prob[0][1] * 100:.2f}%")
 
 if __name__ == "__main__":
     main()

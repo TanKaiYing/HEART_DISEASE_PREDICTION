@@ -27,31 +27,18 @@ def encode_input(input_data):
     input_data['HadKidneyDisease'] = input_data['HadKidneyDisease'].map(yes_no_map)
     input_data['HadAngina'] = input_data['HadAngina'].map(yes_no_map)
 
-    # need to change
-    # input_data['PhysicalHealthDays'] = input_data['PhysicalHealthDays'].map(yes_no_map)
-    # input_data['MentalHealthDays'] = input_data['MentalHealthDays'].map(yes_no_map)
-    # input_data['HeightInMeters'] = input_data['HeightInMeters'].map(yes_no_map)
-    # input_data['WeightInKilograms'] = input_data['WeightInKilograms'].map(yes_no_map)
-    # input_data['BMI'] = input_data['BMI'].map(yes_no_map)
-    # input_data['GeneralHealth'] = input_data['GeneralHealth'].map(yes_no_map)
-    # input_data['RemovedTeeth'] = input_data['RemovedTeeth'].map(yes_no_map)
-    # input_data['ChestScan'] = input_data['ChestScan'].map(yes_no_map)
-    # input_data['DifficultyWalking'] = input_data['DifficultyWalking'].map(yes_no_map)
-    # input_data['HadDiabetes'] = input_data['HadDiabetes'].map(yes_no_map)
-    # input_data['PneumoVaxEver'] = input_data['PneumoVaxEver'].map(yes_no_map)
-    # input_data['DeafOrHardOfHearing'] = input_data['DeafOrHardOfHearing'].map(yes_no_map)
-
-
-
     return input_data
 
 def main():
-    st.set_page_config(page_title="Heart Disease Prediction App", page_icon=":heart:")
-
-    st.title("Heart Disease Prediction App")
+    st.set_page_config(
+        page_title="Heart Disease Prediction App",
+        page_icon="images/heart-fav.png"
+    )
+    
+    st.title("Web Application in Predicting Heart Disease")
     st.subheader("Are you wondering about the condition of your heart? "
                  "This app will help you to diagnose it!")
-    
+
     col1, col2 = st.columns([1, 3])
 
     with col1:
@@ -71,6 +58,7 @@ def main():
             </style>""", unsafe_allow_html=True)
         submit = st.button("Predict")
 
+    
     with col2:
         st.markdown("""
         **Did you know that heart attacks are the leading cause of death globally?**
@@ -90,34 +78,8 @@ def main():
         
         
             """)
-
-    heart = load_dataset()
-
     st.sidebar.title("Feature Selection")
     st.sidebar.image("images/heart-sidebar.png", width=200)
-
-    input_df = user_input_features()
-    df = pd.concat([input_df, heart], axis=1)
-
-    df.fillna(0, inplace=True)  # Handle missing values more thoughtfully based on your model
-
-    log_model = pickle.load(open(LOG_MODEL_PATH, "rb"))
-
-    if submit:
-        prediction = log_model.predict(df)
-        prediction_prob = log_model.predict_proba(df)
-        if prediction == 0:
-            st.markdown(f"**The probability that you'll have"
-                        f" heart disease is {round(prediction_prob[0][1] * 100, 2)}%."
-                        f" You are healthy!**")
-                                   
-        else:
-            st.markdown(f"**The probability that you will have"
-                        f" heart disease is {round(prediction_prob[0][1] * 100, 2)}%."
-                        f" It sounds like you are not healthy.**")
-           
-                        
-    
     # User input
     age_cat_options = ["Age 18 to 24", "Age 25 to 29", "Age 30 to 34", "Age 35 to 39",
                        "Age 40 to 44", "Age 45 to 49", "Age 50 to 54", "Age 55 to 59",
@@ -146,11 +108,32 @@ def main():
         "HadAngina": [chestpain],
     })
 
+
     # Encode user inputs
     input_encoded = encode_input(input_data)
 
+    # Scale user inputs
+    scaler = StandardScaler()
+    input_scaled = scaler.fit_transform(input_encoded)
+
+    if submit:
+        # Make a prediction
+        prediction = log_model.predict(input_scaled)
+        prediction_prob = log_model.predict_proba(input_scaled)
+
+        # Display results
+        st.subheader('Prediction Results')
+        if prediction == 0:
+            st.markdown(f"**The probability that you'll have"
+                        f" heart disease is {round(prediction_prob[0][1] * 100, 2)}%."
+                        f" You have a low risk of heart disease.**")
+                                   
+        else:
+            st.markdown(f"**The probability that you will have"
+                        f" heart disease is {round(prediction_prob[0][1] * 100, 2)}%."
+                        f" You have a high risk of heart disease.**")         
+
+                             
+
 if __name__ == "__main__":
     main()
-
-
-
